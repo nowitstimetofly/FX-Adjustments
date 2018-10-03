@@ -1,0 +1,125 @@
+<doctype HTML>
+
+<html>
+
+<head>
+</head>
+
+<body>
+<p>This is a test for python code within HTML.</p>
+
+<%
+#i = 0
+#while i<6:
+#    i+=1
+#    if i==3:
+#        continue
+#    print(i)
+    
+#https://www.bankofcanada.ca/valet/observations/FXUSDCAD/json?start_date=2018-09-01&end_date=2018-09-27
+import json, urllib, datetime
+#urllib3.disable_warnings()
+#from datetime import date
+#today = date.today()
+#print(today)
+
+#http = urllib3.PoolManager()
+
+#rates = http.request('GET', "https://www.bankofcanada.ca/valet/observations/FXUSDCAD/json?start_date=2018-04-09&end_date=2018-09-12")
+
+import urllib.request
+
+today=(str(datetime.date.today()))
+year = input("What is the year of the data that you would like your query to begin?")
+month = input("What is the month of the data that you would like your query to begin?")
+day = input("What is the day of the data that you would like your query to begin?")
+if len(year)<4:
+    year="20"+year
+
+if len(month)<2:
+    month="0"+month
+
+if len(day)<2:
+    day="0"+day
+    
+addy=("https://www.bankofcanada.ca/valet/observations/FXUSDCAD/json?start_date="+year+"-"+month+"-"+day+"&end_date="+today)
+print (addy)
+with urllib.request.urlopen(addy) as url:
+    data = json.loads(url.read().decode())
+#    print(data["observations"][1]["d"])
+#    print(data["observations"][1]["FXUSDCAD"]["v"])
+#print(str(len(data)["observations"]))
+
+dict = data["observations"]
+
+rateList = []
+for i in dict:
+    rateList.append(i['FXUSDCAD']['v'])
+
+numObs = len(data["observations"])
+aveRate = sum(rateList)/(numObs)
+
+print("There are {} days in this dataset and the average rate is {}.".format(numObs, aveRate))
+
+for i in dict:
+    print (i['d'] + "\t" + str(i['FXUSDCAD']['v']))
+
+currMonth = datetime.date.today().month
+
+if currMonth in (1,2,3):
+    quarter = 'Q1'
+elif currMonth in (4,5,6):
+    quarter = 'Q2'
+elif currMonth in (7,8,9):
+    quarter = 'Q3'
+elif currMonth in (10,11,12):
+    quarter = 'Q4'
+print(quarter)
+print(currMonth - 3)
+print(datetime.date.today().month)
+print(datetime.date.today().day)
+print(datetime.date.today().year)
+
+#print(sum(rateList))
+
+file = ("USDtoCAD"+today+".xls")
+f = open(file,"w+")
+
+f.write('date')
+f.write('\t')
+f.write('rate')
+f.write('\n')
+
+dict = data["observations"]
+
+for i in dict:
+    f.write(i['d'] + "\t" + str(i['FXUSDCAD']['v']))
+    f.write('\n')
+    
+f.write('Average')
+f.write('\t')
+f.write(str(aveRate))
+    
+#count = (len(data["observations"]))
+#date = (data["observations"][0]["d"])
+#value = (str(data["observations"][0]["FXUSDCAD"]["v"]))
+
+#for item in data["observations"][0]["d"]:
+#    for value in item:
+#        for i in value:
+#            f.write(i)
+
+#        f.write(date+"\t"+value+"\n")
+
+f.close()
+
+#rates_dict = json.loads(rates.data.decode('UTF-8'))
+
+#print(rates)
+
+%>
+
+<p>Did it work?</p>
+
+</body>
+</html>
